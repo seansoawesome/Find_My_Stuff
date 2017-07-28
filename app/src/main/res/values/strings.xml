@@ -7,15 +7,6 @@
     <string name="title_list">Items</string>
     <string name="title">Welcome to Find My Stuff, Select one of the options below to begin!</string>
     <string name="item_name_hint">Item Name</string>
-    <string-array name="sports_array">
-        <item>Item 1</item>
-        <item>Item 2</item>
-        <item>Item 3</item>
-        <item>Item 4</item>
-        <item>Item 5</item>
-        <item>Item 6</item>
-        <item>Lucky Number 7</item>
-    </string-array>
 
     <string name="google_android_map_api_key">AIzaSyAHadY8QefttF0zGn-IdKN8quc4jNgxTAw</string>
     <string name="get_location_button">get location button</string>

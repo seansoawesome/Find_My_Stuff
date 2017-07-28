@@ -31,7 +31,11 @@ public class antiLossItem
         item_pic = pic;
     }
 
-
+    @Override
+    public String toString()
+    {
+        return "Item: " + get_name() +" | Location: "+get_loc().latitude + ", "+get_loc().longitude;
+    }
 
     public String get_name()
     {

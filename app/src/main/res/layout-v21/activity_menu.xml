@@ -29,13 +29,61 @@
 
     </FrameLayout>
 
+    <RelativeLayout
+        android:id="@+id/photo_result"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            app:srcCompat="@drawable/common_google_signin_btn_icon_light_normal_background" />
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/imageView"
+            android:layout_toEndOf="@+id/imageView"
+            android:ems="10"
+            android:hint="@string/item_name_hint"
+            android:inputType="textPersonName" />
+
+        <ToggleButton
+            android:id="@+id/toggleButton"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:layout_above="@+id/editText"
+            android:layout_alignEnd="@+id/editText"
+            android:layout_marginBottom="19dp"
+            android:layout_marginEnd="55dp"
+            android:textOff="Location Disabled"
+            android:textOn="Location Enabled" />
+
+        <Button
+            android:id="@+id/button_submit_2"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/add_thing"
+            android:backgroundTint="?android:attr/colorPressedHighlight"
+            android:onClick="onSubmitClick2" />
+
+    </RelativeLayout>
+
     <ListView
         android:id="@+id/item_list"
         android:layout_width="wrap_content"
         android:layout_height="391dp"
         android:layout_weight="0.17"
         android:alwaysDrawnWithCache="false"
-        android:entries="@array/sports_array"
         android:headerDividersEnabled="false"
         android:visibility="gone" />
 
