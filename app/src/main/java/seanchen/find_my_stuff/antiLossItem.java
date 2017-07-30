@@ -18,6 +18,11 @@ public class antiLossItem
     private Image item_pic;
     private Date item_date = new Date();
 
+    public antiLossItem(String name)
+    {
+        item_name = name;
+    }
+
     public antiLossItem(String name, LatLng loc)
     {
         item_name = name;

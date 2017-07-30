@@ -45,7 +45,7 @@
             app:srcCompat="@drawable/common_google_signin_btn_icon_light_normal_background" />
 
         <EditText
-            android:id="@+id/editText"
+            android:id="@+id/item_name_cam"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/imageView"
@@ -53,17 +53,6 @@
             android:ems="10"
             android:hint="@string/item_name_hint"
             android:inputType="textPersonName" />
-
-        <ToggleButton
-            android:id="@+id/toggleButton"
-            android:layout_width="100dp"
-            android:layout_height="60dp"
-            android:layout_above="@+id/editText"
-            android:layout_alignEnd="@+id/editText"
-            android:layout_marginBottom="19dp"
-            android:layout_marginEnd="55dp"
-            android:textOff="Location Disabled"
-            android:textOn="Location Enabled" />
 
         <Button
             android:id="@+id/button_submit_2"
@@ -76,6 +65,17 @@
             android:backgroundTint="?android:attr/colorPressedHighlight"
             android:onClick="onSubmitClick2" />
 
+        <Switch
+            android:id="@+id/loc_switch"
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:layout_above="@+id/item_name_cam"
+            android:layout_marginBottom="30dp"
+            android:layout_toStartOf="@+id/button_submit_2"
+            android:text="Location"
+            android:textOff="Off"
+            android:textOn="On" />
+
     </RelativeLayout>
 
     <ListView
@@ -85,6 +85,14 @@
         android:layout_weight="0.17"
         android:alwaysDrawnWithCache="false"
         android:headerDividersEnabled="false"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/empty_list"
+        android:layout_width="match_parent"
+        android:layout_height="390dp"
+        android:layout_weight="4.40"
+        android:text="No Items To Display"
         android:visibility="gone" />
 
     <RelativeLayout

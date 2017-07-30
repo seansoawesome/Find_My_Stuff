@@ -1,10 +1,11 @@
-//TODO: overall still super buggy, dont forget to put a shit ton of if statements
+//TODO: overall still super buggy, requires a lot of security statements
 package seanchen.find_my_stuff;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -13,9 +14,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -41,18 +44,17 @@ public class Menu extends AppCompatActivity implements
         GoogleMap.OnMapClickListener
 {
 
-    private TextView mTextMessage;
-    private ListView view_list;
-    private RelativeLayout add_loc_menu;
-    private RelativeLayout add_cam_menu;
-    private TextView user_input;
-    private Button buttonAddLoc;
-    private LatLng cur_loc;
-    private Marker cur_marker;
-    private boolean list_menu = false;
-    private boolean add_menu = false;
-    private List<antiLossItem> item_list = new ArrayList<antiLossItem>();
-    private String mCurrentPhotoPath;
+    private TextView mTextMessage;//the title of each menu
+    private TextView user_input;//the input box in the add_location menu
+    private TextView user_input2;//the input box in the snap_it menu
+    private TextView empty;
+    private ListView view_list;//the list box in the items menu
+    private RelativeLayout add_loc_menu;//the layout in add_location menu
+    private RelativeLayout add_cam_menu;//the layout  in snap_it menu
+    private Switch location_switch;//the switch in the snap_it menu | user decides if they want loc or not
+    private LatLng cur_loc;// supposedly the coordinates of the current loc
+    private Marker cur_marker;//google maps marker
+    private List<antiLossItem> item_list = new ArrayList<antiLossItem>();//an arraylist of type antiLostItem
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -70,26 +72,34 @@ public class Menu extends AppCompatActivity implements
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
+        //all menu's visibility are set to GONE first
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_camera:
-                    view_list.setVisibility(View.GONE);
-                    add_loc_menu.setVisibility(View.GONE);
+                    empty.setVisibility(View.GONE);
+                    view_list.setVisibility(View.GONE);//close the items menu
+                    add_loc_menu.setVisibility(View.GONE);//close the add_location menu
 
-                    mTextMessage.setText(R.string.title_camera);
-                    dispatchTakePictureIntent();
-                    /*Intent i = new Intent(Menu.this, pictureTime.class);
-                    startActivity(i);*/
+                    mTextMessage.setText(R.string.title_camera);//set title
+                    dispatchTakePictureIntent();//start camera
+
                     return true;
                 case R.id.navigation_addLoc:
-                    add_cam_menu.setVisibility(View.GONE);
+                    empty.setVisibility(View.GONE);
                     view_list.setVisibility(View.GONE);
+                    add_cam_menu.setVisibility(View.GONE);//close the snap_it menu
 
                     mTextMessage.setText(R.string.title_addLoc);
                     add_loc_menu.setVisibility(View.VISIBLE);
-                    add_menu = true;
                     return true;
                 case R.id.navigation_list:
+                    if(item_list.isEmpty()) {
+                        empty.setVisibility(View.VISIBLE);
+                        System.out.println("null");
+                    }else {
+                        empty.setVisibility(View.GONE);
+                        System.out.println("not null");
+                    }
                     add_cam_menu.setVisibility(View.GONE);
                     add_loc_menu.setVisibility(View.GONE);
 
@@ -108,23 +118,43 @@ public class Menu extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
+        //initiate google map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        //imgMyLocation = (ImageView) findViewById(R.id.imgMyLocation);
+        //initialize the various layouts and buttons to their respective counterparts in activity_menu
+        empty = (TextView) findViewById(R.id.empty_list);
+        user_input = (TextView) findViewById(R.id.item_name);
+        user_input2 = (TextView) findViewById(R.id.item_name_cam);
+        location_switch = (Switch) findViewById(R.id.loc_switch);
         add_loc_menu = (RelativeLayout) findViewById(R.id.addLocMenu);
         add_cam_menu = (RelativeLayout) findViewById(R.id.photo_result);
-        buttonAddLoc = (Button) findViewById(R.id.add_loc_button);
         mTextMessage = (TextView) findViewById(R.id.message);
 
-        //lists out the object in R.id.item_list of type ListView
         //TODO: display text AND icon on the side if there is one
         //TODO: save the array for next time/ restore the array from last time
+        //List out the contents of the arrayList in items_menu
+        //toString() function in class is default, i think
         view_list = (ListView) findViewById(R.id.item_list);
         ArrayAdapter<antiLossItem> adapter = new ArrayAdapter<antiLossItem>(this, android.R.layout.simple_list_item_1, item_list);
         view_list.setAdapter(adapter);
 
+        //the switch button in snap_it menu
+        location_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                if(isChecked)
+                {
+                    //TODO update LatLng cur_loc
+                    //location enabled
+                }else{
+                    //TODO figure something out with constructors of type antiLossItem
+                }
+            }
+        });
+
+        //initialize the navigation menu on th bottom of the screen
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
@@ -138,7 +168,7 @@ public class Menu extends AppCompatActivity implements
     }
 
     @Override
-    //get image icon and post it somewhere(?)
+    //get image icon and post it to imageView in snap_it menu
     //saved the image in my phone's path: /storage/9C33-6BBD/DCIM/100ANDRO/DSC_7157.JPG
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
@@ -147,18 +177,25 @@ public class Menu extends AppCompatActivity implements
             ImageView mImageView = (ImageView) findViewById(R.id.imageView) ;
             mImageView.setImageBitmap(imageBitmap);
             //start form process
+            add_cam_menu.setVisibility(View.VISIBLE);
         }
-        add_cam_menu.setVisibility(View.VISIBLE);
     }
 
     public void onSubmitClick2 (View view)
     {
-        //TODO: Get input value
-        //TODO: Get location when toggle button is enabled and dispay it
-        //TODO: save as new object and add to current list
-        //TODO: Clear input text
+        if(user_input2.getText().toString().matches(""))//if textView is empty
+        {
+            Toast.makeText(this, "ENTER NAME PLEASE", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //TODO: Get location when toggle button is enabled and dispay it and add it to object constructor
+        String input = user_input2.getText().toString();
         Toast.makeText(this, "supposedly saved", Toast.LENGTH_SHORT).show();
         add_cam_menu.setVisibility(View.GONE);
+        LatLng g = new LatLng(0.0,0.0);//TODO: figure out how to get current loc coordinates
+        antiLossItem i = new antiLossItem(input, g);
+        item_list.add(i);
+        user_input2.setText("");//clear the textbox
     }
 
     /**---------------------------------List_the_objects-----------------------------------------**/
@@ -166,7 +203,6 @@ public class Menu extends AppCompatActivity implements
 
     public void onSubmitClick(View view)
     {
-        user_input = (TextView) findViewById(R.id.item_name);
         String t = user_input.getText().toString();
         if(user_input.getText().toString().matches(""))
         {
@@ -176,9 +212,7 @@ public class Menu extends AppCompatActivity implements
         LatLng g = cur_marker.getPosition();
         antiLossItem i = new antiLossItem(t, g);
         item_list.add(i);
-        //HOW TO SAVE i into system???
-        //HOW TO ACCESS i in strings.xml???
-        //ALT: HOW TO DISPLAY AN ARRAY OF i ON ACTIVITY MENU?
+
         user_input.setText("");
         cur_marker.setVisible(false);
         Toast.makeText(this, "you did it", Toast.LENGTH_SHORT).show();
@@ -188,7 +222,7 @@ public class Menu extends AppCompatActivity implements
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
-        LatLng rando_place = new LatLng(24.8138, 120.9675);
+        LatLng rando_place = new LatLng(24.8138, 120.9675);//random place i chose for default purposes
         cur_marker = mMap.addMarker(new MarkerOptions().title("Current Chosen Location").position(rando_place).draggable(true));
         mMap.setOnMapClickListener(this);
         mMap.setOnMyLocationButtonClickListener(this);
@@ -213,9 +247,7 @@ public class Menu extends AppCompatActivity implements
         }
     }
 
-    /**
-     * Displays a dialog with error message explaining that the location permission is missing.
-     */
+    // Displays a dialog with error message explaining that the location permission is missing.
     private void showMissingPermissionError() {
         PermissionUtils.PermissionDeniedDialog
                 .newInstance(true).show(getSupportFragmentManager(), "dialog");
@@ -236,6 +268,7 @@ public class Menu extends AppCompatActivity implements
 
     @Override
     public boolean onMyLocationButtonClick() {
+        //TODO: marker doesn't appear on top of location. It is based on the camera coordinates (center of screen)
         Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
         cur_marker.setPosition(mMap.getCameraPosition().target);
         // Return false so that we don't consume the event and the default behavior still occurs
