@@ -1,6 +1,8 @@
 package seanchen.find_my_stuff;
 
-import android.media.Image;
+//import android.media.Image;
+import android.graphics.Bitmap;
+import android.widget.ImageView;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -15,8 +17,10 @@ public class antiLossItem
 {
     private String item_name;
     private LatLng item_loc;
-    private Image item_pic;
+    private Bitmap item_pic;
     private Date item_date = new Date();
+    private boolean containPic;
+    private boolean containLoc;
 
     public antiLossItem(String name)
     {
@@ -27,13 +31,25 @@ public class antiLossItem
     {
         item_name = name;
         item_loc = loc;
+        containPic = false;
+        containLoc = true;
     }
 
-    public antiLossItem(String name, LatLng loc, Image pic)
+    public antiLossItem(String name, LatLng loc, Bitmap pic)
     {
         item_name = name;
         item_loc = loc;
         item_pic = pic;
+        containPic = true;
+        containLoc = true;
+    }
+
+    public antiLossItem(String name, Bitmap pic)
+    {
+        item_name = name;
+        item_pic = pic;
+        containPic = false;
+        containLoc = false;
     }
 
     @Override
@@ -52,7 +68,7 @@ public class antiLossItem
         return item_loc;
     }
 
-    public Image get_pic()
+    public Bitmap get_pic()
     {
         return item_pic;
     }
@@ -61,4 +77,8 @@ public class antiLossItem
     {
         return item_date;
     }
+
+    public boolean has_pic(){return containPic;}
+
+    public boolean has_loc() {return containLoc;}
 }
