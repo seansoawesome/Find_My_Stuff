@@ -1,15 +1,28 @@
 apply plugin: 'com.android.application'
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId "seanchen.find_my_stuff"
         minSdkVersion 19
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        //used by Room
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation":
+                                     "$projectDir/schemas".toString()]
+            }
+        }
+        //end
+    }
+    // used by Room, to test migrations
+    sourceSets {
+        androidTest.assets.srcDirs +=
+                files("$projectDir/schemas".toString())
     }
     buildTypes {
         release {
@@ -24,13 +37,19 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support:support-vector-drawable:25.3.1'
+    compile 'com.android.support:appcompat-v7:26.1.0'
+
+    compile 'com.android.support:design:26.1.0'
+    compile 'com.android.support:support-vector-drawable:26.1.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:support-v4:25.3.1'
-//    compile 'com.google.firebase:firebase-database:11.8.0'
-    compile 'com.google.android.gms:play-services-maps:10.2.6' //11.8.0'//10.2.6
+    compile 'com.android.support:support-v4:26.1.0'
+//    compile 'com.google.firebase:firebase-database:11.8.0'//online database
+    compile 'com.google.android.gms:play-services-maps:10.2.6' //11.8.0'//switch to 11.8.0 for online database
+
+    compile "android.arch.persistence.room:runtime:1.0.0"//database ROOM
+    annotationProcessor "android.arch.persistence.room:compiler:1.0.0"//database ROOM
+    androidTestImplementation "android.arch.persistence.room:testing:1.0.0"//database ROOM
+
     testCompile 'junit:junit:4.12'
 }
 apply plugin: 'com.google.gms.google-services'

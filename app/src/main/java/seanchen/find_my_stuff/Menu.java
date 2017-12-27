@@ -1,6 +1,7 @@
 //TODO: overall still super buggy, requires a lot of security statements
 package seanchen.find_my_stuff;
 
+import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Criteria;
@@ -47,6 +48,8 @@ public class Menu extends AppCompatActivity implements
         OnMapReadyCallback,
         GoogleMap.OnMapClickListener
 {
+
+    AppDataBase db;
 
     private TextView mTextMessage;//the title of each menu
     private TextView user_input;//the input box in the add_location menu
@@ -127,6 +130,10 @@ public class Menu extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
+        //init database. ROOM
+        db = Room.databaseBuilder(getApplicationContext(),
+                AppDataBase.class, "sample-db").build();
+
         //initiate google map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -148,6 +155,9 @@ public class Menu extends AppCompatActivity implements
         //toString() function in class is default, i think
         view_list = (ListView) findViewById(R.id.item_list);
 //        ArrayAdapter<antiLossItem> adapter = new ArrayAdapter<antiLossItem>(this, android.R.layout.simple_list_item_1, item_list);
+
+        item_list = db.userDao().getAllPeople();
+
         antiLossItemAdapter adapter = new antiLossItemAdapter(this, item_list);
         view_list.setAdapter(adapter);
 
@@ -212,9 +222,11 @@ public class Menu extends AppCompatActivity implements
             LatLng g = new LatLng(loc.getLatitude(), loc.getLongitude());
             antiLossItem i = new antiLossItem(input, g, tmp_img);
             item_list.add(i);
+            db.userDao().insertAll(i);
         }else{
             antiLossItem i = new antiLossItem(input, tmp_img);
             item_list.add(i);
+            db.userDao().insertAll(i);
         }
         picTaken = false;
         user_input2.setText("");//clear the textbox
@@ -235,6 +247,8 @@ public class Menu extends AppCompatActivity implements
         LatLng g = cur_marker.getPosition();
         antiLossItem i = new antiLossItem(t, g);
         item_list.add(i);
+
+        db.userDao().insertAll(i);
 
         user_input.setText("");
         cur_marker.setVisible(false);
