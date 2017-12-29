@@ -171,13 +171,14 @@ public class Menu extends AppCompatActivity implements
         view_list.setAdapter(adapter);
 
         //listviewlistener so user has options for each longclikc for an item
-        //TODO: not deleting properly?
         view_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 db.deleteItem((int)id);
+                //ALT:update arrayadapter by deleting the element
+                adapter.remove(adapter.getItem((int)id));
                 view_list.invalidate();
-                //item_count--;
+
                 item_count = db.getItemsCount();
                 Toast.makeText(Menu.this, "item long clicked and supposedly delted"+id, Toast.LENGTH_SHORT).show();
                 return true;

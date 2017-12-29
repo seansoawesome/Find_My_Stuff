@@ -171,12 +171,14 @@ public class itemDatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Deleting single item
-    //TODO: investigate this function, possible suspect?
-    public void deleteItem(int i)
+    public void deleteItem(int id)
     {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_NAME, ID + " = ?",
-                new String[] { String.valueOf(i) });
-        db.close();
+        //maybe this line?<= yes this line works
+        this.getWritableDatabase().delete(TABLE_NAME, ID +"="+id, null);
+        //buggy code
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        db.delete(TABLE_NAME, ID + " = ?",
+//                new String[] { String.valueOf(id) });
+//        db.close();
     }
 }
