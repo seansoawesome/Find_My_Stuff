@@ -1,4 +1,3 @@
-//TODO: overall still super buggy, requires a lot of security statements
 package seanchen.find_my_stuff;
 
 import android.content.Context;
@@ -13,12 +12,14 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -66,6 +67,7 @@ public class Menu extends AppCompatActivity implements
     private ListView view_list;//the list box in the items menu
     private RelativeLayout add_loc_menu;//the layout in add_location menu
     private RelativeLayout add_cam_menu;//the layout  in snap_it menu
+    private ConstraintLayout item_layout;//the layout that shows the deets for an item
     private Switch location_switch;//the switch in the snap_it menu | user decides if they want loc or not
     private LatLng cur_loc;// supposedly the coordinates of the current loc
     private Marker cur_marker;//google maps marker
@@ -161,14 +163,26 @@ public class Menu extends AppCompatActivity implements
         mTextMessage = (TextView) findViewById(R.id.message);
         picTaken = false;
 
-        //TODO: display text AND icon on the side if there is one
-        //TODO: save the array for next time/ restore the array from last time
         //List out the contents of the arrayList in items_menu
         //toString() function in class is default, i think
         view_list = (ListView) findViewById(R.id.item_list);
 //        ArrayAdapter<antiLossItem> adapter = new ArrayAdapter<antiLossItem>(this, android.R.layout.simple_list_item_1, item_list);
-        antiLossItemAdapter adapter = new antiLossItemAdapter(this, item_list);
+        final antiLossItemAdapter adapter = new antiLossItemAdapter(this, item_list);
         view_list.setAdapter(adapter);
+
+        //listviewlistener so user has options for each longclikc for an item
+        //TODO: not deleting properly?
+        view_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                db.deleteItem((int)id);
+                view_list.invalidate();
+                //item_count--;
+                item_count = db.getItemsCount();
+                Toast.makeText(Menu.this, "item long clicked and supposedly delted"+id, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
 
         //the switch button in snap_it menu
         location_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -267,6 +281,8 @@ public class Menu extends AppCompatActivity implements
         Toast.makeText(this, "you did it", Toast.LENGTH_SHORT).show();
     }
 
+
+
     /**---------------------------------GoogleMaps-----------------------------------------------**/
     @Override
     public void onMapReady(GoogleMap map) {
@@ -349,7 +365,6 @@ public class Menu extends AppCompatActivity implements
 
     @Override
     public boolean onMyLocationButtonClick() {
-        //TODO: marker doesn't appear on top of location. It is based on the camera coordinates (center of screen)
         Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
         drawMarker(loc);
         //        cur_marker.setPosition(mMap.getCameraPosition().target);

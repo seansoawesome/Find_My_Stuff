@@ -66,6 +66,7 @@ public class itemDatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         //funfact: contentvalues is not in order as it uses a hash table!!
+        //TODO: picture bitmap not updating correctly??
         ContentValues values = new ContentValues();
         LatLng temp;
         byte[] temp_pic;
@@ -170,11 +171,12 @@ public class itemDatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Deleting single item
-    public void deleteItem(antiLossItem i)
+    //TODO: investigate this function, possible suspect?
+    public void deleteItem(int i)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_NAME, ID + " = ?",
-                new String[] { String.valueOf(i.get_id()) });
+                new String[] { String.valueOf(i) });
         db.close();
     }
 }

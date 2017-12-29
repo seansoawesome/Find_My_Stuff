@@ -85,6 +85,7 @@
         android:layout_weight="0.17"
         android:alwaysDrawnWithCache="false"
         android:headerDividersEnabled="false"
+        android:longClickable="true"
         android:visibility="gone" />
 
     <TextView
