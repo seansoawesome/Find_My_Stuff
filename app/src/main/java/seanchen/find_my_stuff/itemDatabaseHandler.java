@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -62,15 +65,24 @@ public class itemDatabaseHandler extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        //TODO: FIX BUG HERE!!!!!!!!!!!
+        //funfact: contentvalues is not in order as it uses a hash table!!
         ContentValues values = new ContentValues();
-        LatLng temp = i.get_loc();
+        LatLng temp;
+        byte[] temp_pic;
+        if(i.has_loc())
+            temp = i.get_loc();
+        else
+            temp = new LatLng(0,0);
+        if(i.has_pic())
+            temp_pic = converter.img_to_byte(i.get_pic());
+        else
+            temp_pic = converter.img_to_byte(converter.bitmap_color_bg(Color.WHITE));//NULL choice
         values.put(ID, i.get_id()); //item id
         values.put(ITEM, i.get_name()); // item Name
         values.put(LAT, temp.latitude); // item latitude
         values.put(LNG, temp.longitude); //item longitude
         values.put(DATE, i.get_date().toString());//item date
-        values.put(PIC, converter.img_to_byte(i.get_pic())); //item pic
+        values.put(PIC, temp_pic); //item pic
 
         // Inserting Row
         db.insert(TABLE_NAME, null, values);
@@ -91,7 +103,8 @@ public class itemDatabaseHandler extends SQLiteOpenHelper {
         antiLossItem i = new antiLossItem(Integer.parseInt(cursor.getString(0)), //item id
                 cursor.getString(1),//item name
                 converter.doubles_to_latlng(cursor.getDouble(2),cursor.getDouble(3)),//item loc
-               converter.byte_to_img(cursor.getBlob(5)) );//item pic
+               converter.byte_to_img(cursor.getBlob(5)),//item pic
+                converter.string_to_date(cursor.getString(4)));//item date
         // return contact
         return i;
     }
@@ -116,7 +129,8 @@ public class itemDatabaseHandler extends SQLiteOpenHelper {
                 antiLossItem i = new antiLossItem(Integer.parseInt(cursor.getString(0)), //item id
                         cursor.getString(1),//item name
                         converter.doubles_to_latlng(cursor.getDouble(2),cursor.getDouble(3)),//item loc
-                        converter.byte_to_img(cursor.getBlob(5)) );//item pic
+                        converter.byte_to_img(cursor.getBlob(5)),//item pic
+                        converter.string_to_date(cursor.getString(4)));//item date
                 // Adding contact to list
                 item_list.add(i);
             } while (cursor.moveToNext());

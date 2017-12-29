@@ -19,45 +19,48 @@ public class antiLossItem
     private String item_name;
     private LatLng item_loc;
     private Bitmap item_pic;
-    private Date item_date = new Date();
-    private boolean containPic;
-    private boolean containLoc;
+    private Date item_date;
+    private boolean containPic = false;
+    private boolean containLoc = false;
 
     public antiLossItem(){}
 
-    public antiLossItem(int id, String name)
-    {
-        this.item_name = name;
-        this.item_id = id;
-    }
+//    public antiLossItem(int id, String name)
+//    {
+//        this.item_name = name;
+//        this.item_id = id;
+//    }
+//
+//    public antiLossItem(int id, String name, LatLng loc)
+//    {
+//        this.item_name = name;
+//        this.item_loc = loc;
+//        this.containPic = false;
+//        this.containLoc = true;
+//        this.item_id = id;
+//    }
 
-    public antiLossItem(int id, String name, LatLng loc)
-    {
-        this.item_name = name;
-        this.item_loc = loc;
-        this.containPic = false;
-        this.containLoc = true;
-        this.item_id = id;
-    }
-
-    public antiLossItem(int id, String name, LatLng loc, Bitmap pic)
+    public antiLossItem(int id, String name, LatLng loc, Bitmap pic, Date date)
     {
         this.item_name = name;
         this.item_loc = loc;
         this.item_pic = pic;
-        this.containPic = true;
-        this.containLoc = true;
+        if(pic!= null)
+            this.containPic = true;
+        if(loc!=null)
+            this.containLoc = true;
         this.item_id = id;
+        this.item_date = date;
     }
 
-    public antiLossItem(int id, String name, Bitmap pic)
-    {
-        this.item_name = name;
-        this.item_pic = pic;
-        this.containPic = false;
-        this.containLoc = false;
-        this.item_id = id;
-    }
+//    public antiLossItem(int id, String name, Bitmap pic)
+//    {
+//        this.item_name = name;
+//        this.item_pic = pic;
+//        this.containPic = false;
+//        this.containLoc = false;
+//        this.item_id = id;
+//    }
 
     @Override
     public String toString()

@@ -42,6 +42,7 @@ import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Menu extends AppCompatActivity implements
@@ -70,6 +71,7 @@ public class Menu extends AppCompatActivity implements
     private Marker cur_marker;//google maps marker
     private List<antiLossItem> item_list = new ArrayList<antiLossItem>();//an arraylist of type antiLostItem
     private Location loc;
+    private Date date = new Date();
     private boolean useLoc;
     private boolean picTaken;
 
@@ -137,9 +139,9 @@ public class Menu extends AppCompatActivity implements
 
         //init databse
         db = new itemDatabaseHandler(this);
-        Log.d(Menu.class.getSimpleName(), "db inited");//SAFE
+        //Log.d(Menu.class.getSimpleName(), "db inited");//SAFE
         item_count = db.getItemsCount();
-        Log.d(Menu.class.getSimpleName(), "itemcount:" + item_count);
+        //Log.d(Menu.class.getSimpleName(), "itemcount:" + item_count);
         if(item_count > 0)
             item_list = db.getAllItems();
         Log.d(Menu.class.getSimpleName(), "itemlist copied over");
@@ -175,6 +177,7 @@ public class Menu extends AppCompatActivity implements
                 if(isChecked)
                 {
                     useLoc = true;
+                    date = new Date();
                 }else{
                     useLoc = false;
                 }
@@ -204,6 +207,7 @@ public class Menu extends AppCompatActivity implements
             img = (ImageView) findViewById(R.id.imageView);
             img.setImageBitmap(tmp_img);
             picTaken = true;
+            date = new Date();
             //start form process
             add_cam_menu.setVisibility(View.VISIBLE);
         }
@@ -227,11 +231,11 @@ public class Menu extends AppCompatActivity implements
         add_cam_menu.setVisibility(View.GONE);
         if(useLoc == true) {
             LatLng g = new LatLng(loc.getLatitude(), loc.getLongitude());
-            antiLossItem i = new antiLossItem(item_count, input, g, tmp_img);
+            antiLossItem i = new antiLossItem(item_count, input, g, tmp_img, date);
             item_list.add(i);
             db.addItem(i);
         }else{
-            antiLossItem i = new antiLossItem(item_count, input, null, tmp_img);
+            antiLossItem i = new antiLossItem(item_count, input, null, tmp_img, date);
             item_list.add(i);
             db.addItem(i);
         }
@@ -253,7 +257,7 @@ public class Menu extends AppCompatActivity implements
             return;
         }
         LatLng g = cur_marker.getPosition();
-        antiLossItem i = new antiLossItem(item_count, t, g, null);
+        antiLossItem i = new antiLossItem(item_count, t, g, null, date);
         item_list.add(i);
         db.addItem(i);
         item_count++;
