@@ -15,6 +15,7 @@ import java.util.Date;
 
 public class antiLossItem
 {
+    private int item_id;
     private String item_name;
     private LatLng item_loc;
     private Bitmap item_pic;
@@ -22,61 +23,68 @@ public class antiLossItem
     private boolean containPic;
     private boolean containLoc;
 
-    public antiLossItem(String name)
+    public antiLossItem(){}
+
+    public antiLossItem(int id, String name)
     {
-        item_name = name;
+        this.item_name = name;
+        this.item_id = id;
     }
 
-    public antiLossItem(String name, LatLng loc)
+    public antiLossItem(int id, String name, LatLng loc)
     {
-        item_name = name;
-        item_loc = loc;
-        containPic = false;
-        containLoc = true;
+        this.item_name = name;
+        this.item_loc = loc;
+        this.containPic = false;
+        this.containLoc = true;
+        this.item_id = id;
     }
 
-    public antiLossItem(String name, LatLng loc, Bitmap pic)
+    public antiLossItem(int id, String name, LatLng loc, Bitmap pic)
     {
-        item_name = name;
-        item_loc = loc;
-        item_pic = pic;
-        containPic = true;
-        containLoc = true;
+        this.item_name = name;
+        this.item_loc = loc;
+        this.item_pic = pic;
+        this.containPic = true;
+        this.containLoc = true;
+        this.item_id = id;
     }
 
-    public antiLossItem(String name, Bitmap pic)
+    public antiLossItem(int id, String name, Bitmap pic)
     {
-        item_name = name;
-        item_pic = pic;
-        containPic = false;
-        containLoc = false;
+        this.item_name = name;
+        this.item_pic = pic;
+        this.containPic = false;
+        this.containLoc = false;
+        this.item_id = id;
     }
 
     @Override
     public String toString()
     {
-        return "Item: " + get_name() +" | Location: "+get_loc().latitude + ", "+get_loc().longitude;
+        return "Location: " + get_loc().latitude + ", " + get_loc().longitude;
+    }
+
+    public String coord_to_String(LatLng c)
+    {
+        return "Lat:" + c.latitude +", Lng:" + c.longitude;
     }
 
     public String get_name()
     {
         return item_name;
     }
+    public void set_name(String n) {this.item_name = n; }
 
-    public LatLng get_loc()
-    {
-        return item_loc;
-    }
+    public LatLng get_loc() { return item_loc; }
+    public void set_loc(double lat, double lng) {LatLng t = new LatLng(lat,lng); item_loc = t;}
 
-    public Bitmap get_pic()
-    {
-        return item_pic;
-    }
+    public Bitmap get_pic() { return item_pic; }
 
-    public Date get_date()
-    {
-        return item_date;
-    }
+    public Date get_date() { return item_date; }
+
+    public int get_id(){ return item_id; }
+    public void  set_id(int id) {this.item_id = id;}
 
     public boolean has_pic(){return containPic;}
 

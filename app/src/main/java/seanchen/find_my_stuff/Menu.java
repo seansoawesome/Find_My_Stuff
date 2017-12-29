@@ -1,7 +1,9 @@
 //TODO: overall still super buggy, requires a lot of security statements
 package seanchen.find_my_stuff;
 
+import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.location.Criteria;
 import android.location.Location;
@@ -14,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -47,6 +50,11 @@ public class Menu extends AppCompatActivity implements
         OnMapReadyCallback,
         GoogleMap.OnMapClickListener
 {
+
+    //SQLite Database var
+    private itemDatabaseHandler db;
+    private int item_count;
+    //end
 
     private TextView mTextMessage;//the title of each menu
     private TextView user_input;//the input box in the add_location menu
@@ -127,6 +135,15 @@ public class Menu extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
+        //init databse
+        db = new itemDatabaseHandler(this);
+        Log.d(Menu.class.getSimpleName(), "db inited");//SAFE
+        item_count = db.getItemsCount();
+        Log.d(Menu.class.getSimpleName(), "itemcount:" + item_count);
+        if(item_count > 0)
+            item_list = db.getAllItems();
+        Log.d(Menu.class.getSimpleName(), "itemlist copied over");
+
         //initiate google map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -204,18 +221,21 @@ public class Menu extends AppCompatActivity implements
             Toast.makeText(this, "TAKE A PICTURE PLEASE", Toast.LENGTH_SHORT).show();
             return;
         }
-        //TODO: Get location when toggle button is enabled and dispay it and add it to object constructor
+
         String input = user_input2.getText().toString();
         Toast.makeText(this, "supposedly saved", Toast.LENGTH_SHORT).show();
         add_cam_menu.setVisibility(View.GONE);
         if(useLoc == true) {
             LatLng g = new LatLng(loc.getLatitude(), loc.getLongitude());
-            antiLossItem i = new antiLossItem(input, g, tmp_img);
+            antiLossItem i = new antiLossItem(item_count, input, g, tmp_img);
             item_list.add(i);
+            db.addItem(i);
         }else{
-            antiLossItem i = new antiLossItem(input, tmp_img);
+            antiLossItem i = new antiLossItem(item_count, input, null, tmp_img);
             item_list.add(i);
+            db.addItem(i);
         }
+        item_count++;
         picTaken = false;
         user_input2.setText("");//clear the textbox
         location_switch.setChecked(false);
@@ -233,8 +253,10 @@ public class Menu extends AppCompatActivity implements
             return;
         }
         LatLng g = cur_marker.getPosition();
-        antiLossItem i = new antiLossItem(t, g);
+        antiLossItem i = new antiLossItem(item_count, t, g, null);
         item_list.add(i);
+        db.addItem(i);
+        item_count++;
 
         user_input.setText("");
         cur_marker.setVisible(false);

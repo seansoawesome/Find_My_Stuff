@@ -43,7 +43,7 @@ public class antiLossItemAdapter extends ArrayAdapter<antiLossItem>
 //            BitmapDrawable d = (BitmapDrawable) itempic.getDrawable();
 //            itempic.setImageDrawable(d);
         }
-            // Populate the data into the template view using the data object
+        // Populate the data into the template view using the data object
         itemname.setText(user.get_name());
         itemloc.setText(user.get_loc().toString());
         // Return the completed view to render on screen
