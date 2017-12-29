@@ -42,9 +42,9 @@ public class itemDatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db)
     {
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_NAME + "("
-                + ID + " INTEGER PRIMARY KEY," + ITEM + " TEXT,"
-                + LAT + " INTEGER PRIMARY KEY," + LNG + " INTEGER PRIMARY KEY," +
-                DATE + " TEXT," + PIC +" BLOB);";
+                + ID + " INTEGER," + ITEM + " TEXT,"
+                + LAT + " REAL," + LNG + " REAL," +
+                DATE + " TEXT," + PIC +" BLOB" + ");";
         db.execSQL(CREATE_CONTACTS_TABLE);
     }
     @Override
@@ -64,10 +64,11 @@ public class itemDatabaseHandler extends SQLiteOpenHelper {
 
         //TODO: FIX BUG HERE!!!!!!!!!!!
         ContentValues values = new ContentValues();
+        LatLng temp = i.get_loc();
         values.put(ID, i.get_id()); //item id
         values.put(ITEM, i.get_name()); // item Name
-        values.put(LAT, i.get_loc().latitude); // item latitude
-        values.put(LNG, i.get_loc().longitude); //item longitude
+        values.put(LAT, temp.latitude); // item latitude
+        values.put(LNG, temp.longitude); //item longitude
         values.put(DATE, i.get_date().toString());//item date
         values.put(PIC, converter.img_to_byte(i.get_pic())); //item pic
 
