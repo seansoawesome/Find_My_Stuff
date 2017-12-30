@@ -74,7 +74,7 @@ public class Menu extends AppCompatActivity implements
     private List<antiLossItem> item_list = new ArrayList<antiLossItem>();//an arraylist of type antiLostItem
     private Location loc;
     private Date date = new Date();
-    private boolean useLoc;
+    private boolean useLoc = false;
     private boolean picTaken;
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
@@ -175,9 +175,7 @@ public class Menu extends AppCompatActivity implements
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 db.deleteItem((int)id);
-                //ALT:update arrayadapter by deleting the element
                 adapter.remove(adapter.getItem((int)id));
-                view_list.invalidate();
 
                 item_count = db.getItemsCount();
                 Toast.makeText(Menu.this, "item long clicked and supposedly delted"+id, Toast.LENGTH_SHORT).show();
@@ -272,9 +270,16 @@ public class Menu extends AppCompatActivity implements
             return;
         }
         LatLng g = cur_marker.getPosition();
-        antiLossItem i = new antiLossItem(item_count, t, g, null, date);
-        item_list.add(i);
-        db.addItem(i);
+
+        if(useLoc == true) {
+            antiLossItem i = new antiLossItem(item_count, t, g, null, date);
+            item_list.add(i);
+            db.addItem(i);
+        }else{
+            antiLossItem i = new antiLossItem(item_count, t, null, null, date);
+            item_list.add(i);
+            db.addItem(i);
+        }
         item_count++;
 
         user_input.setText("");
@@ -298,6 +303,7 @@ public class Menu extends AppCompatActivity implements
     @Override
     public void onMapClick(LatLng point)
     {
+        useLoc = true;
         cur_marker.setVisible(true);
         cur_marker.setPosition(point);
     }
@@ -368,6 +374,7 @@ public class Menu extends AppCompatActivity implements
     public boolean onMyLocationButtonClick() {
         Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
         drawMarker(loc);
+        useLoc = true;
         //        cur_marker.setPosition(mMap.getCameraPosition().target);
         // Return false so that we don't consume the event and the default behavior still occurs
         // (the camera animates to the user's current position).

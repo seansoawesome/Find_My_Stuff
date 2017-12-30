@@ -73,11 +73,13 @@ public class itemDatabaseHandler extends SQLiteOpenHelper {
         if(i.has_loc())
             temp = i.get_loc();
         else
-            temp = new LatLng(0,0);
+            temp = new LatLng(0,0);//NULL choice
+
         if(i.has_pic())
             temp_pic = converter.img_to_byte(i.get_pic());
         else
             temp_pic = converter.img_to_byte(converter.bitmap_color_bg(Color.WHITE));//NULL choice
+
         values.put(ID, i.get_id()); //item id
         values.put(ITEM, i.get_name()); // item Name
         values.put(LAT, temp.latitude); // item latitude

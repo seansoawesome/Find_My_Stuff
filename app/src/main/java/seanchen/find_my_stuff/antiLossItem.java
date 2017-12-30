@@ -2,6 +2,7 @@ package seanchen.find_my_stuff;
 
 //import android.media.Image;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.widget.ImageView;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -22,6 +23,7 @@ public class antiLossItem
     private Date item_date;
     private boolean containPic = false;
     private boolean containLoc = false;
+    blobToByteUtil converter = new blobToByteUtil();
 
     public antiLossItem(){}
 
