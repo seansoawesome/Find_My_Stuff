@@ -34,6 +34,8 @@ public class antiLossItemAdapter extends ArrayAdapter<antiLossItem>
         // Lookup view for data population
         TextView itemname = (TextView) convertView.findViewById(R.id.name);
         TextView itemloc = (TextView) convertView.findViewById(R.id.location);
+        TextView itemid = (TextView) convertView.findViewById(R.id.item_id);
+        TextView itemdate = (TextView) convertView.findViewById(R.id.date);
         if(user.has_pic())
         {
             ImageView itempic = (ImageView) convertView.findViewById(R.id.picture);
@@ -43,9 +45,15 @@ public class antiLossItemAdapter extends ArrayAdapter<antiLossItem>
 //            BitmapDrawable d = (BitmapDrawable) itempic.getDrawable();
 //            itempic.setImageDrawable(d);
         }
-            // Populate the data into the template view using the data object
+        // Populate the data into the template view using the data object
         itemname.setText(user.get_name());
-        itemloc.setText(user.get_loc().toString());
+        if(!(user.has_loc()) || (user.get_loc().latitude == 0.0 && user.get_loc().longitude == 0.0))
+            itemloc.setText("No Location Available");
+        else
+            itemloc.setText(user.get_loc().toString());
+        itemid.setText("ID: " + user.get_id());
+        itemdate.setText(user.get_date().toString());
+
         // Return the completed view to render on screen
         return convertView;
     }
