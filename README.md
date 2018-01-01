@@ -1,0 +1,6 @@
+# Find_My_Stuff
+Android App
+This simple app's goal is to help you remember where you put things. Oftentimes, I forget where I park my bike in school. Therefore I wanted to make an app that can remember the location of the object. Some special features of this app is that you can take a picture of the item to remember its location or just simply select a point on the map to indicate where the item is. Additionally, it has the option to find nearby landmarks to better help you assist in spotting the item faster.
+One of the biggest challenges I had was figuring out how to store inputted data on the phone. It took a while to figure out how to implement SQlite in the app but I believe I now have a strong grasp on customizing its class to fit my needs. I was able to put in the database all sorts of data types and iterate through each row to find specific data.
+Another challenge faced was just getting used to the variety of components in constructing an android application. In the beginning it was challenging to set up different layouts and views of the app, so some parts of the code are not well written implementations. 
+Overall I learned alot making this app and look forward to making better and more complicated programs.
