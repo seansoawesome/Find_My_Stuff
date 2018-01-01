@@ -18,4 +18,9 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="picture">picture taken</string>
+    <string name="location">Location</string>
+    <string name="off">Off</string>
+    <string name="on">On</string>
+    <string name="no_items_to_display">No Items To Display</string>
 </resources>

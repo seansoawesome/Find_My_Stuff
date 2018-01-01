@@ -42,7 +42,8 @@
             android:layout_height="150dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            app:srcCompat="@drawable/common_google_signin_btn_icon_light_normal_background" />
+            app:srcCompat="@drawable/common_google_signin_btn_icon_light_normal_background"
+            android:contentDescription="@string/picture" />
 
         <EditText
             android:id="@+id/item_name_cam"
@@ -72,9 +73,9 @@
             android:layout_above="@+id/item_name_cam"
             android:layout_marginBottom="30dp"
             android:layout_toStartOf="@+id/button_submit_2"
-            android:text="Location"
-            android:textOff="Off"
-            android:textOn="On" />
+            android:text="@string/location"
+            android:textOff="@string/off"
+            android:textOn="@string/on" />
 
     </RelativeLayout>
 
@@ -93,7 +94,7 @@
         android:layout_width="match_parent"
         android:layout_height="390dp"
         android:layout_weight="4.40"
-        android:text="No Items To Display"
+        android:text="@string/no_items_to_display"
         android:visibility="gone" />
 
     <RelativeLayout
