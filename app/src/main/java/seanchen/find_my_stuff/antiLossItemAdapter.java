@@ -47,10 +47,10 @@ public class antiLossItemAdapter extends ArrayAdapter<antiLossItem>
         }
         // Populate the data into the template view using the data object
         itemname.setText(user.get_name());
-        if(user.has_loc())
-            itemloc.setText(user.get_loc().toString());
-        else
+        if(!(user.has_loc()) || (user.get_loc().latitude == 0.0 && user.get_loc().longitude == 0.0))
             itemloc.setText("No Location Available");
+        else
+            itemloc.setText(user.get_loc().toString());
         itemid.setText("ID: " + user.get_id());
         itemdate.setText(user.get_date().toString());
 

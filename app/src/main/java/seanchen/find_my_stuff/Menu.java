@@ -1,8 +1,8 @@
 package seanchen.find_my_stuff;
 
-import android.content.Context;
+import android.net.Uri;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.location.Criteria;
 import android.location.Location;
@@ -10,18 +10,16 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -50,13 +48,16 @@ public class Menu extends AppCompatActivity implements
         GoogleMap.OnMyLocationButtonClickListener,
         ActivityCompat.OnRequestPermissionsResultCallback,
         OnMapReadyCallback,
-        GoogleMap.OnMapClickListener
-{
+        GoogleMap.OnMapClickListener {
 
     //SQLite Database var
     private itemDatabaseHandler db;
     private int item_count;
     //end
+
+    //Item List View
+    private int current_index;
+    antiLossItemAdapter adapter;
 
     private TextView mTextMessage;//the title of each menu
     private TextView user_input;//the input box in the add_location menu
@@ -67,15 +68,13 @@ public class Menu extends AppCompatActivity implements
     private ListView view_list;//the list box in the items menu
     private RelativeLayout add_loc_menu;//the layout in add_location menu
     private RelativeLayout add_cam_menu;//the layout  in snap_it menu
-    private ConstraintLayout item_layout;//the layout that shows the deets for an item
     private Switch location_switch;//the switch in the snap_it menu | user decides if they want loc or not
-    private LatLng cur_loc;// supposedly the coordinates of the current loc
     private Marker cur_marker;//google maps marker
     private List<antiLossItem> item_list = new ArrayList<antiLossItem>();//an arraylist of type antiLostItem
     private Location loc;
     private Date date = new Date();
     private boolean useLoc = false;
-    private boolean picTaken;
+    private boolean picTaken = false;
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -87,7 +86,9 @@ public class Menu extends AppCompatActivity implements
     private boolean mPermissionDenied = false;
 
     private GoogleMap mMap;
-    /**---------------------------------Bottom_Menu----------------------------------------------**/
+    /**
+     * ---------------------------------Bottom_Menu----------------------------------------------
+     **/
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -114,10 +115,10 @@ public class Menu extends AppCompatActivity implements
                     add_loc_menu.setVisibility(View.VISIBLE);
                     return true;
                 case R.id.navigation_list:
-                    if(item_list.isEmpty()) {
+                    if (item_list.isEmpty()) {
                         empty.setVisibility(View.VISIBLE);
                         System.out.println("null");
-                    }else {
+                    } else {
                         empty.setVisibility(View.GONE);
                         System.out.println("not null");
                     }
@@ -133,7 +134,9 @@ public class Menu extends AppCompatActivity implements
 
     };
 
-    /**---------------------------------Start----------------------------------------------------**/
+    /**
+     * ---------------------------------Start----------------------------------------------------
+     **/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -144,9 +147,9 @@ public class Menu extends AppCompatActivity implements
         //Log.d(Menu.class.getSimpleName(), "db inited");//SAFE
         item_count = db.getItemsCount();
         //Log.d(Menu.class.getSimpleName(), "itemcount:" + item_count);
-        if(item_count > 0)
+        if (item_count > 0)
             item_list = db.getAllItems();
-        Log.d(Menu.class.getSimpleName(), "itemlist copied over");
+        //Log.d(Menu.class.getSimpleName(), "itemlist copied over");
 
         //initiate google map
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -167,31 +170,26 @@ public class Menu extends AppCompatActivity implements
         //toString() function in class is default, i think
         view_list = (ListView) findViewById(R.id.item_list);
 //        ArrayAdapter<antiLossItem> adapter = new ArrayAdapter<antiLossItem>(this, android.R.layout.simple_list_item_1, item_list);
-        final antiLossItemAdapter adapter = new antiLossItemAdapter(this, item_list);
+        adapter = new antiLossItemAdapter(this, item_list);
         view_list.setAdapter(adapter);
-
+        registerForContextMenu(view_list);
         //listviewlistener so user has options for each longclikc for an item
-        view_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                db.deleteItem((int)id);
-                adapter.remove(adapter.getItem((int)id));
-
-                item_count = db.getItemsCount();
-                Toast.makeText(Menu.this, "item long clicked and supposedly delted"+id, Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });
+//        view_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+////                options.setVisibility(View.VISIBLE);
+//                current_index = (int)id;
+//                return true;
+//            }
+//        });
 
         //the switch button in snap_it menu
         location_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                if(isChecked)
-                {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
                     useLoc = true;
                     date = new Date();
-                }else{
+                } else {
                     useLoc = false;
                 }
             }
@@ -202,7 +200,9 @@ public class Menu extends AppCompatActivity implements
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
-    /**---------------------------------CAMERA---------------------------------------------------**/
+    /**
+     * ---------------------------------CAMERA---------------------------------------------------
+     **/
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -226,65 +226,111 @@ public class Menu extends AppCompatActivity implements
         }
     }
 
-    public void onSubmitClick2 (View view)
-    {
-        if(user_input2.getText().toString().matches(""))//if textView is empty
+    public void onSubmitClick2(View view) {
+        if (user_input2.getText().toString().matches(""))//if textView is empty
         {
             Toast.makeText(this, "ENTER NAME PLEASE", Toast.LENGTH_SHORT).show();
             return;
         }
-        if(picTaken == false)//if textView is empty
+        if (picTaken == false)//if textView is empty
         {
             Toast.makeText(this, "TAKE A PICTURE PLEASE", Toast.LENGTH_SHORT).show();
             return;
         }
-
+        item_count++;
         String input = user_input2.getText().toString();
         Toast.makeText(this, "supposedly saved", Toast.LENGTH_SHORT).show();
         add_cam_menu.setVisibility(View.GONE);
-        if(useLoc == true) {
+        if (useLoc == true) {
             LatLng g = new LatLng(loc.getLatitude(), loc.getLongitude());
             antiLossItem i = new antiLossItem(item_count, input, g, tmp_img, date);
             item_list.add(i);
             db.addItem(i);
-        }else{
+        } else {
             antiLossItem i = new antiLossItem(item_count, input, null, tmp_img, date);
             item_list.add(i);
             db.addItem(i);
         }
-        item_count++;
         picTaken = false;
+        useLoc = false;
         user_input2.setText("");//clear the textbox
         location_switch.setChecked(false);
     }
 
-    /**---------------------------------List_the_objects-----------------------------------------**/
+    /**
+     * ---------------------------------List_the_objects-----------------------------------------
+     **/
     //TODO: allow a delete button so user can delete objects
-
-    public void onSubmitClick(View view)
-    {
+    public void onSubmitClick(View view) {
         String t = user_input.getText().toString();
-        if(user_input.getText().toString().matches(""))
-        {
+        if (user_input.getText().toString().matches("")) {
             Toast.makeText(this, "ENTER NAME PLEASE", Toast.LENGTH_SHORT).show();
             return;
         }
+        item_count++;
         LatLng g = cur_marker.getPosition();
 
-        if(useLoc == true) {
+        if (useLoc == true) {
             antiLossItem i = new antiLossItem(item_count, t, g, null, date);
             item_list.add(i);
             db.addItem(i);
-        }else{
+        } else {
             antiLossItem i = new antiLossItem(item_count, t, null, null, date);
             item_list.add(i);
             db.addItem(i);
         }
-        item_count++;
 
+        useLoc = false;
         user_input.setText("");
         cur_marker.setVisible(false);
         Toast.makeText(this, "you did it", Toast.LENGTH_SHORT).show();
+    }
+
+//    private void delete_item()
+//    {
+//        db.deleteItem(current_index);
+//        adapter.remove(adapter.getItem(current_index));
+//        item_count = db.getItemsCount();
+//        options.setVisibility(View.GONE);
+//    }
+
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+    }
+
+    public boolean onContextItemSelected(MenuItem item) {
+        //find out which menu item was pressed
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.remove_item:
+                remove_item((int)info.id);
+                return true;
+            case R.id.directions_to_item:
+                doOptionTwo((int)info.id);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void remove_item(int id)
+    {
+        db.deleteItem(id);
+        adapter.remove(adapter.getItem(id));
+    }
+
+    private void doOptionTwo(int id) {
+        LatLng loc= adapter.getItem(id).get_loc();
+        Uri gmmIntentUri = Uri.parse("geo:" + loc.latitude + "," + loc.longitude + "?q=landmarks");
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        if (mapIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(mapIntent);
+        }
+        //Toast.makeText(this, "Option Two Chosen...", Toast.LENGTH_LONG).show();
     }
 
 
@@ -304,6 +350,7 @@ public class Menu extends AppCompatActivity implements
     public void onMapClick(LatLng point)
     {
         useLoc = true;
+        date = new Date();
         cur_marker.setVisible(true);
         cur_marker.setPosition(point);
     }
@@ -311,7 +358,8 @@ public class Menu extends AppCompatActivity implements
     @Override
     protected void onResumeFragments() {
         super.onResumeFragments();
-        if (mPermissionDenied) {
+        if (mPermissionDenied)
+        {
             // Permission was not granted, display error dialog.
             showMissingPermissionError();
             mPermissionDenied = false;
@@ -322,6 +370,8 @@ public class Menu extends AppCompatActivity implements
     private void drawMarker(Location location){
         LatLng ltlng = new LatLng(loc.getLatitude(), loc.getLongitude());
         cur_marker.setPosition(ltlng);
+        date = new Date();
+        useLoc = true;
     }
 
     // Displays a dialog with error message explaining that the location permission is missing.

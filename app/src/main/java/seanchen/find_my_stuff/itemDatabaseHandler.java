@@ -66,7 +66,6 @@ public class itemDatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         //funfact: contentvalues is not in order as it uses a hash table!!
-        //TODO: picture bitmap not updating correctly??
         ContentValues values = new ContentValues();
         LatLng temp;
         byte[] temp_pic;
@@ -163,9 +162,26 @@ public class itemDatabaseHandler extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
+        //funfact: contentvalues is not in order as it uses a hash table!!
         ContentValues values = new ContentValues();
-        values.put(ITEM, i.get_name());
-//        values.put(ID, i.get_id());
+        LatLng temp;
+        byte[] temp_pic;
+        if(i.has_loc())
+            temp = i.get_loc();
+        else
+            temp = new LatLng(0.0,0.0);//NULL choice
+
+        if(i.has_pic())
+            temp_pic = converter.img_to_byte(i.get_pic());
+        else
+            temp_pic = converter.img_to_byte(converter.bitmap_color_bg(Color.WHITE));//NULL choice
+
+        values.put(ID, i.get_id()); //item id
+        values.put(ITEM, i.get_name()); // item Name
+        values.put(LAT, temp.latitude); // item latitude
+        values.put(LNG, temp.longitude); //item longitude
+        values.put(DATE, i.get_date().toString());//item date
+        values.put(PIC, temp_pic); //item pic
 
         // updating row
         return db.update(TABLE_NAME, values, ID + " = ?",
@@ -177,6 +193,25 @@ public class itemDatabaseHandler extends SQLiteOpenHelper {
     {
         //maybe this line?<= yes this line works
         this.getWritableDatabase().delete(TABLE_NAME, ID +"="+id, null);
+
+        //TODO:update id count
+//        String selectQuery = "SELECT  * FROM " + TABLE_NAME;
+//
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        Cursor cursor = db.rawQuery(selectQuery, null);
+//        cursor.moveToPosition(id);//move to index n
+//        while(cursor.moveToNext())
+//        {
+//            antiLossItem i = new antiLossItem(Integer.parseInt(cursor.getString(0)) - 1, //item id
+//                    cursor.getString(1),//item name
+//                    converter.doubles_to_latlng(cursor.getDouble(2),cursor.getDouble(3)),//item loc
+//                    converter.byte_to_img(cursor.getBlob(5)),//item pic
+//                    converter.string_to_date(cursor.getString(4)));//item date
+//            updateItem(i);
+//        }
+
+
+
         //buggy code
 //        SQLiteDatabase db = this.getWritableDatabase();
 //        db.delete(TABLE_NAME, ID + " = ?",
